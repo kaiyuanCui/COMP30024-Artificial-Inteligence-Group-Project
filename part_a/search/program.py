@@ -28,3 +28,16 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
         (1, 4, 0, -1),
         (1, 3, 0, -1)
     ]
+
+
+class board_state:
+    # i am not sure if this is correct, but i attempted to start with the creation of the board_state class - Bryant
+    def __init__(self, parent, blue_power, red_power, board, g_value, action_taken):
+        self.parent = parent
+        self.blue_power = blue_power
+        self.red_power = red_power
+        self.board = board
+        self.g_value = g_value
+        self.action_taken = action_taken
+
+
