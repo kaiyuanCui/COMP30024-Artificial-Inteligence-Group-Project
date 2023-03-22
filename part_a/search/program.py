@@ -2,6 +2,7 @@
 # Project Part A: Single Player Infexion
 
 from .utils import render_board
+from .utils import board_state
 
 
 def search(input: dict[tuple, tuple]) -> list[tuple]:
@@ -13,6 +14,7 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
 
     See the specification document for more details.
     """
+    initial_state = get_initial_board_state(input)
 
     # The render_board function is useful for debugging -- it will print out a 
     # board state in a human-readable format. Try changing the ansi argument 
@@ -29,15 +31,16 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
         (1, 3, 0, -1)
     ]
 
+def get_initial_board_state(input: dict[tuple, tuple]) -> board_state:
+    powers = {'r': 0,  'b':0} # powers of red and blue
+    for cell_state in input.values():
+        powers[cell_state[0]] += cell_state[1]
+      
 
-class board_state:
-    # i am not sure if this is correct, but i attempted to start with the creation of the board_state class - Bryant
-    def __init__(self, parent, blue_power, red_power, board, g_value, action_taken):
-        self.parent = parent
-        self.blue_power = blue_power
-        self.red_power = red_power
-        self.board = board
-        self.g_value = g_value
-        self.action_taken = action_taken
+
+    return board_state(None, powers['b'], powers['r'], input, 0, None)
+
+
+
 
 

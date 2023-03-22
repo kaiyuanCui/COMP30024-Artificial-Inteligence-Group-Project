@@ -73,3 +73,26 @@ def render_board(board: dict[tuple, tuple], ansi=False) -> str:
             output += "    "
         output += "\n"
     return output
+
+
+class board_state:
+    # i am not sure if this is correct, but i attempted to start with the creation of the board_state class - Bryant
+    # i think this should work, apparently in python we can't overload the constructor, so i made a function to handle the initial state - Kevin
+    def __init__(self, parent, blue_power: int, red_power: int, board:dict[tuple, tuple], g_value: int, action_taken:tuple):
+        self.parent = parent
+        self.blue_power = blue_power
+        self.red_power = red_power
+        self.board = board
+        self.g_value = g_value
+        self.action_taken = action_taken
+        # for debug
+        self.render_board_state()
+
+    def render_board_state(self):
+        print("=========NEW BOARD STATE=========\n")
+        print("blue power: " + str(self.blue_power))
+        print("red power: " + str(self.red_power))
+        print("g value: " + str(self.g_value))
+        print("action taken: " + str(self.action_taken))
+        print(render_board(self.board))
+        print("================================\n")
