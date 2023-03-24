@@ -52,9 +52,9 @@ def spread(current_board: board, direction: tuple, coordinate: tuple):
         curr_power = (current_board[target_coordinate])[1]
         # if a cell's power exceeds 6, it is removed from the game
         if curr_power == 6:
-            current_board[target_coordinate] = None
+            current_board.pop(target_coordinate)
         # empty cell
-        else if current_board[target_coordinate] == None:
+        else if (current_board.get(target_coordinate) == None):
             current_board[target_coordinate] = ("r", 1)
         # case where the power of the cell is in a valid range
         else:
