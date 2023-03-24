@@ -1,6 +1,6 @@
 # COMP30024 Artificial Intelligence, Semester 1 2023
 # Project Part A: Single Player Infexion
-
+import math
 def apply_ansi(str, bold=True, color=None):
     """
     Wraps a string with ANSI control codes to enable basic terminal-based
@@ -76,6 +76,9 @@ def render_board(board: dict[tuple, tuple], ansi=False) -> str:
 
 
 class board_state:
+    MAX_CELL_POWER = 6
+    SIDE_WIDTH = 7
+
     # i am not sure if this is correct, but i attempted to start with the creation of the board_state class - Bryant
     # i think this should work, apparently in python we can't overload the constructor, so i made a function to handle the initial state - Kevin
     def __init__(self, parent, blue_power: int, red_power: int, board:dict[tuple, tuple], g_value: int, action_taken:tuple):
@@ -94,5 +97,21 @@ class board_state:
         print("red power: " + str(self.red_power))
         print("g value: " + str(self.g_value))
         print("action taken: " + str(self.action_taken))
+        print("f value: " + str(self.compute_f_value()))
         print(render_board(self.board))
         print("================================\n")
+
+    def compute_f_value(self):
+        # i am not sure if this heuristic function works:
+        # 'relax' the rules such that we can freely rearrange all the cells at no cost
+        # if we put all of the blues in stacks of 5,
+        # we can take {red_power} of the blue stacks in the first turn (red_power <6), and 6 stacks every following turns
+        # e.g. the best case scenario for any given values of red and blue power(?)
+
+        # this should be always lower than the true cost? we might be able to come up with a better function though.
+        # the problem with this is that it doesn't take into account the distances between the cells, which will be a big portion of the total cost
+        # however, the distances between every cell would be costly to compute for every board state
+
+
+
+        return self.g_value + (self.blue_power/self.MAX_CELL_POWER - min(self.MAX_CELL_POWER, self.red_power))/ (self.SIDE_WIDTH -1) + 1
