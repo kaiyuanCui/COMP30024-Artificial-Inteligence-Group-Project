@@ -40,6 +40,25 @@ def get_initial_board_state(input: dict[tuple, tuple]) -> board_state:
 
     return board_state(None, powers['b'], powers['r'], input, 0, None)
 
+def spread(current_board: board, direction: tuple, coordinate: tuple):
+    power = current_board[coordinate]
+    for step in range(1, power + 1):
+        target_coordinate = coordinate + direction * step
+        # accounting for the wrap around of the board
+        if target_coordinate[0] >= 7:
+            target_coordinate[0] = target_coordinate - 7
+        if target_coordinate[1] >= 7:
+            target_coordinate[1] = target_coordinate - 7
+        curr_power = (current_board[target_coordinate])[1]
+        # if a cell's power exceeds 6, it is removed from the game
+        if curr_power == 6:
+            current_board[target_coordinate] = None
+        # empty cell
+        else if current_board[target_coordinate] == None:
+            current_board[target_coordinate] = ("r", 1)
+        # case where the power of the cell is in a valid range
+        else:
+            current_board[target_coordinate] = ("r", power + 1)
 
 
 
