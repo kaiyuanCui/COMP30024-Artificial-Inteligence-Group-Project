@@ -46,9 +46,9 @@ def spread(current_board: board, direction: tuple, coordinate: tuple):
         target_coordinate = coordinate + direction * step
         # accounting for the wrap around of the board
         if target_coordinate[0] >= 7:
-            target_coordinate[0] = target_coordinate - 7
+            target_coordinate = (target_coordinate[0] - 7, target_coordinate[1])
         if target_coordinate[1] >= 7:
-            target_coordinate[1] = target_coordinate - 7
+            target_coordinate = (target_coordinate[0], target_coordinate[1] - 7)
         curr_power = (current_board[target_coordinate])[1]
         # if a cell's power exceeds 6, it is removed from the game
         if curr_power == 6:
@@ -58,7 +58,7 @@ def spread(current_board: board, direction: tuple, coordinate: tuple):
             current_board[target_coordinate] = ("r", 1)
         # case where the power of the cell is in a valid range
         else:
-            current_board[target_coordinate] = ("r", power + 1)
+            current_board[target_coordinate] = ("r", curr_power + 1)
 
 
 
