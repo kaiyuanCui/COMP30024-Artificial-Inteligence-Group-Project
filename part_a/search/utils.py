@@ -89,10 +89,11 @@ class board_state:
         self.g_value = g_value
         self.action_taken = action_taken
         # for debug
+        print("NEW BOARD STATE:")
         self.render_board_state()
 
     def render_board_state(self):
-        print("=========NEW BOARD STATE=========\n")
+        print("================================\n")
         print("blue power: " + str(self.blue_power))
         print("red power: " + str(self.red_power))
         print("g value: " + str(self.g_value))
@@ -115,3 +116,11 @@ class board_state:
 
 
         return self.g_value + (self.blue_power/self.MAX_CELL_POWER - min(self.MAX_CELL_POWER, self.red_power))/ (self.SIDE_WIDTH -1) + 1
+    
+    def generate_children(self):
+        # spread in every possible directions and get the resulting board states
+        return []
+    
+    def get_all_actions(self):
+        # trace back to root node and find all actions taken
+        return (None,None,None,None)
