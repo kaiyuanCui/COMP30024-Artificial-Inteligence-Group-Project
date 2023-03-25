@@ -3,6 +3,7 @@
 
 from .utils import render_board
 from .utils import board_state
+from queue import PriorityQueue
 
 
 def search(input: dict[tuple, tuple]) -> list[tuple]:
@@ -14,7 +15,23 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
 
     See the specification document for more details.
     """
+ 
+    
+    generated = PriorityQueue()
     initial_state = get_initial_board_state(input)
+    generated.put(initial_state, initial_state.compute_f_value())
+    while not generated.empty():
+        curr_state = generated.get()
+        # for debug
+        print("EXPANDING:")
+        curr_state.render_board_state()
+        if curr_state.blue_power == 0:
+            return curr_state.get_all_actions()
+        for state in curr_state.generate_children():
+            generated.put(state, state.compute_f_value())
+        
+    # no solution is found, which should not be possible if our algorithm is correct    
+    return []
 
     # The render_board function is useful for debugging -- it will print out a 
     # board state in a human-readable format. Try changing the ansi argument 
@@ -40,7 +57,7 @@ def get_initial_board_state(input: dict[tuple, tuple]) -> board_state:
 
     return board_state(None, powers['b'], powers['r'], input, 0, None)
 
-def spread(current_board: board, direction: tuple, coordinate: tuple):
+def spread(current_board: board_state, direction: tuple, coordinate: tuple):
     power = current_board[coordinate]
     for step in range(1, power + 1):
         target_coordinate = coordinate + direction * step
@@ -54,7 +71,7 @@ def spread(current_board: board, direction: tuple, coordinate: tuple):
         if curr_power == 6:
             current_board.pop(target_coordinate)
         # empty cell
-        else if (current_board.get(target_coordinate) == None):
+        elif current_board.get(target_coordinate) == None:
             current_board[target_coordinate] = ("r", 1)
         # case where the power of the cell is in a valid range
         else:
