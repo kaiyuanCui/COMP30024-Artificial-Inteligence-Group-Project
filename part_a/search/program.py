@@ -19,10 +19,10 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
     
     generated = PriorityQueue()
     initial_state = get_initial_board_state(input)
+    # sort by insert order when f values are the same
     insert_order = 0
     generated.put((initial_state.compute_f_value(), insert_order, initial_state))
     while not generated.empty():
-        
         curr_state = generated.get()[-1]
         print(curr_state)
         # for debug
@@ -32,7 +32,7 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
             return curr_state.get_all_actions()
         for state in curr_state.generate_children():
             insert_order += 1
-            generated.put((state.compute_f_value(), insert_order ,state))
+            generated.put((state.compute_f_value(), insert_order , state))
         
     # no solution is found, which should not be possible if our algorithm is correct    
     return []
