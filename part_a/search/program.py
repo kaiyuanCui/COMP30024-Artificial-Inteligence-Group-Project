@@ -19,16 +19,20 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
     
     generated = PriorityQueue()
     initial_state = get_initial_board_state(input)
-    generated.put(initial_state, initial_state.compute_f_value())
+    insert_order = 0
+    generated.put((initial_state.compute_f_value(), insert_order, initial_state))
     while not generated.empty():
-        curr_state = generated.get()
+        
+        curr_state = generated.get()[-1]
+        print(curr_state)
         # for debug
         print("EXPANDING:")
         curr_state.render_board_state()
         if curr_state.blue_power == 0:
             return curr_state.get_all_actions()
         for state in curr_state.generate_children():
-            generated.put(state, state.compute_f_value())
+            insert_order += 1
+            generated.put((state.compute_f_value(), insert_order ,state))
         
     # no solution is found, which should not be possible if our algorithm is correct    
     return []
@@ -49,33 +53,9 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
     ]
 
 def get_initial_board_state(input: dict[tuple, tuple]) -> board_state:
-    powers = {'r': 0,  'b':0} # powers of red and blue
-    for cell_state in input.values():
-        powers[cell_state[0]] += cell_state[1]
-      
+    return board_state(None, input, 0, None)
 
 
-    return board_state(None, powers['b'], powers['r'], input, 0, None)
-
-def spread(current_board: board_state, direction: tuple, coordinate: tuple):
-    power = current_board[coordinate]
-    for step in range(1, power + 1):
-        target_coordinate = coordinate + direction * step
-        # accounting for the wrap around of the board
-        if target_coordinate[0] >= 7:
-            target_coordinate = (target_coordinate[0] - 7, target_coordinate[1])
-        if target_coordinate[1] >= 7:
-            target_coordinate = (target_coordinate[0], target_coordinate[1] - 7)
-        curr_power = (current_board[target_coordinate])[1]
-        # if a cell's power exceeds 6, it is removed from the game
-        if curr_power == 6:
-            current_board.pop(target_coordinate)
-        # empty cell
-        elif current_board.get(target_coordinate) == None:
-            current_board[target_coordinate] = ("r", 1)
-        # case where the power of the cell is in a valid range
-        else:
-            current_board[target_coordinate] = ("r", curr_power + 1)
 
 
 
