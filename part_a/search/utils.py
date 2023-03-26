@@ -99,8 +99,8 @@ class board_state:
         self.blue_power = powers[self.BLUE_CELL]
         self.red_power = powers[self.RED_CELL]
         # for debug
-        print("NEW BOARD STATE:")
-        self.render_board_state()
+        # print("NEW BOARD STATE:")
+        # self.render_board_state()
 
     def render_board_state(self):
         print("================================\n")
@@ -113,22 +113,12 @@ class board_state:
         print("================================\n")
 
     def compute_f_value(self):
-        # i am not sure if this heuristic function works:
-        # 'relax' the rules such that we can freely rearrange all the cells at no cost
-        # if we put all of the blues in stacks of 5,
-        # we can take {red_power} of the blue stacks in the first turn (red_power <6), and 6 stacks every following turns
-        # e.g. the best case scenario for any given values of red and blue power(?)
-
-        # this should be always lower than the true cost? we might be able to come up with a better function though.
-        # the problem with this is that it doesn't take into account the distances between the cells, which will be a big portion of the total cost
-        # however, the distances between every cell would be costly to compute for every board state
-
-
-        # I tested it and this heuristic basically makes it a BFS, which doesn't really work. i am working on a better one - Kevin
-        return self.g_value + (self.blue_power/self.MAX_CELL_POWER - min(self.MAX_CELL_POWER, self.red_power))/ (self.SIDE_WIDTH -1) + 1
+        # using the number of blue cells and the heuristic, however this might not be admissable
+        counts = self.count_cells()
+        return self.g_value + counts[self.BLUE_CELL]
     
-    def generate_children(self):
-        # spread in every possible directions and get the resulting board states
+    # spread in every possible directions and get the resulting board states
+    def generate_children(self): 
         children = []
         for coordinates, cell in self.board.items():
             if cell[0] == self.RED_CELL:
@@ -142,7 +132,12 @@ class board_state:
     
     def get_all_actions(self):
         # trace back to root node and find all actions taken
-        return (None,None,None,None)
+        actions = []
+        curr_node = self
+        while(curr_node.parent):
+            actions.insert(0, curr_node.action_taken)
+            curr_node = curr_node.parent
+        return actions
 
 
     # i moved the function here so that generate_children can call it - Kevin
@@ -171,3 +166,9 @@ class board_state:
             else:
                 current_board[target_coordinate] = ("r", curr_power + 1)
       
+    def count_cells(self) -> dict[str, int]:
+        counts = {self.RED_CELL: 0, self.BLUE_CELL: 0}
+        for cell in self.board.values():
+            counts[cell[0]] += 1
+
+        return counts
