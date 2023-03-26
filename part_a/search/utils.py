@@ -76,18 +76,28 @@ def render_board(board: dict[tuple, tuple], ansi=False) -> str:
 
 
 class board_state:
+
+    # i am not sure about the conventions of using constants in python, is this correct?
     MAX_CELL_POWER = 6
     SIDE_WIDTH = 7
+    # (dr, dq) must be one of: (0, 1), (−1, 1), (−1, 0), (0, −1), (1, −1), or, (1, 0)
+    VALID_DIRECTIONS = [(0, 1), (-1, 1), (-1, 0), (0, -1), (1, -1), (1, 0)]
+    RED_CELL = "r"
+    BLUE_CELL = "b"
 
     # i am not sure if this is correct, but i attempted to start with the creation of the board_state class - Bryant
     # i think this should work, apparently in python we can't overload the constructor, so i made a function to handle the initial state - Kevin
-    def __init__(self, parent, blue_power: int, red_power: int, board:dict[tuple, tuple], g_value: int, action_taken:tuple):
+    def __init__(self, parent, board:dict[tuple, tuple], g_value: int, action_taken:tuple):
         self.parent = parent
-        self.blue_power = blue_power
-        self.red_power = red_power
         self.board = board
         self.g_value = g_value
         self.action_taken = action_taken
+
+        powers = {self.RED_CELL: 0,  self.BLUE_CELL:0} # powers of red and blue
+        for cell_state in board.values():
+            powers[cell_state[0]] += cell_state[1]
+        self.blue_power = powers[self.BLUE_CELL]
+        self.red_power = powers[self.RED_CELL]
         # for debug
         print("NEW BOARD STATE:")
         self.render_board_state()
@@ -114,13 +124,50 @@ class board_state:
         # however, the distances between every cell would be costly to compute for every board state
 
 
-
+        # I tested it and this heuristic basically makes it a BFS, which doesn't really work. i am working on a better one - Kevin
         return self.g_value + (self.blue_power/self.MAX_CELL_POWER - min(self.MAX_CELL_POWER, self.red_power))/ (self.SIDE_WIDTH -1) + 1
     
     def generate_children(self):
         # spread in every possible directions and get the resulting board states
-        return []
+        children = []
+        for coordinates, cell in self.board.items():
+            if cell[0] == self.RED_CELL:
+                for direction in self.VALID_DIRECTIONS:
+                    board_copy = dict(self.board)
+                    self.spread(board_copy, direction, coordinates)
+                    children.append(board_state(self, board_copy, self.g_value+1, coordinates + direction))
+        return children
+
+
     
     def get_all_actions(self):
         # trace back to root node and find all actions taken
         return (None,None,None,None)
+
+
+    # i moved the function here so that generate_children can call it - Kevin
+    def spread(self, current_board: dict[tuple, tuple], direction: tuple, coordinate: tuple):
+        power = current_board[coordinate][1]
+        for step in range(1, power + 1):
+            target_coordinate = (coordinate[0] + direction[0] * step, coordinate[1] + direction[1] * step)
+            # accounting for the wrap around of the board
+            if target_coordinate[0] >= 7:
+                target_coordinate = (target_coordinate[0] - 7, target_coordinate[1])
+            if target_coordinate[1] >= 7:
+                target_coordinate = (target_coordinate[0], target_coordinate[1] - 7)
+
+            # handle when target_coordinate is empty
+            if target_coordinate not in current_board.keys():
+                curr_power = 0
+            else:
+                curr_power = (current_board[target_coordinate])[1] 
+            # if a cell's power exceeds 6, it is removed from the game
+            if curr_power == 6:
+                current_board.pop(target_coordinate)
+            # empty cell
+            elif current_board.get(target_coordinate) == None:
+                current_board[target_coordinate] = ("r", 1)
+            # case where the power of the cell is in a valid range
+            else:
+                current_board[target_coordinate] = ("r", curr_power + 1)
+      
