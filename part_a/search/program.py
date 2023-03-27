@@ -28,6 +28,9 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
         # for debug
         print("EXPANDING:")
         curr_state.render_board_state()
+        print("PARENT:")
+        if (curr_state.parent):
+            curr_state.parent.render_board_state()
         if curr_state.blue_power == 0:
             return curr_state.get_all_actions()
         for state in curr_state.generate_children():
@@ -56,7 +59,16 @@ def get_initial_board_state(input: dict[tuple, tuple]) -> board_state:
     return board_state(None, input, 0, None)
 
 
-
+def compute_distances(board: dict[tuple, tuple]) -> dict[tuple, dict[tuple, int]]:
+    distances = {}
+    for blue_cell in board:
+        if blue_cell[0] == 'b':
+            distances[blue_cell] = {}
+            for red_cell in board:
+                if blue_cell[0] == 'r':
+                    # manhattan distances
+                    distances[blue_cell][red_cell] = abs(blue_cell[0] - red_cell[0]) + abs(blue_cell[0] - red_cell[0])
+    return distances
 
 
 
