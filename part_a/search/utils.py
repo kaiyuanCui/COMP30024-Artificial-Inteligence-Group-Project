@@ -10,6 +10,7 @@ VALID_DIRECTIONS = [(0, 1), (-1, 1), (-1, 0), (0, -1), (1, -1), (1, 0)]
 RED_CELL = "r"
 BLUE_CELL = "b"
 
+
 def apply_ansi(str, bold=True, color=None):
     """
     Wraps a string with ANSI control codes to enable basic terminal-based
@@ -85,6 +86,7 @@ def render_board(board: dict[tuple, tuple], ansi=False) -> str:
 
 
 class board_state:
+
     # i am not sure if this is correct, but i attempted to start with the creation of the board_state class - Bryant
     # i think this should work, apparently in python we can't overload the constructor, so i made a function to handle the initial state - Kevin
     def __init__(self, parent, board:dict[tuple, tuple], g_value: int, action_taken:tuple):
@@ -146,10 +148,10 @@ class board_state:
         for step in range(1, power + 1):
             target_coordinate = (coordinate[0] + direction[0] * step, coordinate[1] + direction[1] * step)
             # accounting for the wrap around of the board
-            if target_coordinate[0] >= 7:
-                target_coordinate = (target_coordinate[0] - 7, target_coordinate[1])
-            if target_coordinate[1] >= 7:
-                target_coordinate = (target_coordinate[0], target_coordinate[1] - 7)
+            if target_coordinate[0] >= SIDE_WIDTH:
+                target_coordinate = (target_coordinate[0] - SIDE_WIDTH, target_coordinate[1])
+            if target_coordinate[1] >= SIDE_WIDTH:
+                target_coordinate = (target_coordinate[0], target_coordinate[1] - SIDE_WIDTH)
 
             # handle when target_coordinate is empty
             if target_coordinate not in current_board.keys():
@@ -157,11 +159,8 @@ class board_state:
             else:
                 curr_power = (current_board[target_coordinate])[1] 
             # if a cell's power exceeds 6, it is removed from the game
-            if curr_power == 6:
+            if curr_power == MAX_CELL_POWER:
                 current_board.pop(target_coordinate)
-            # empty cell
-            elif current_board.get(target_coordinate) == None:
-                current_board[target_coordinate] = ("r", 1)
             # case where the power of the cell is in a valid range
             else:
                 current_board[target_coordinate] = ("r", curr_power + 1)
