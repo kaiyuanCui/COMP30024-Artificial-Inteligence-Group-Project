@@ -1,6 +1,15 @@
 # COMP30024 Artificial Intelligence, Semester 1 2023
 # Project Part A: Single Player Infexion
 import math
+
+
+MAX_CELL_POWER = 6
+SIDE_WIDTH = 7
+# (dr, dq) must be one of: (0, 1), (−1, 1), (−1, 0), (0, −1), (1, −1), or, (1, 0)
+VALID_DIRECTIONS = [(0, 1), (-1, 1), (-1, 0), (0, -1), (1, -1), (1, 0)]
+RED_CELL = "r"
+BLUE_CELL = "b"
+
 def apply_ansi(str, bold=True, color=None):
     """
     Wraps a string with ANSI control codes to enable basic terminal-based
@@ -76,15 +85,6 @@ def render_board(board: dict[tuple, tuple], ansi=False) -> str:
 
 
 class board_state:
-
-    # i am not sure about the conventions of using constants in python, is this correct?
-    MAX_CELL_POWER = 6
-    SIDE_WIDTH = 7
-    # (dr, dq) must be one of: (0, 1), (−1, 1), (−1, 0), (0, −1), (1, −1), or, (1, 0)
-    VALID_DIRECTIONS = [(0, 1), (-1, 1), (-1, 0), (0, -1), (1, -1), (1, 0)]
-    RED_CELL = "r"
-    BLUE_CELL = "b"
-
     # i am not sure if this is correct, but i attempted to start with the creation of the board_state class - Bryant
     # i think this should work, apparently in python we can't overload the constructor, so i made a function to handle the initial state - Kevin
     def __init__(self, parent, board:dict[tuple, tuple], g_value: int, action_taken:tuple):
@@ -93,11 +93,11 @@ class board_state:
         self.g_value = g_value
         self.action_taken = action_taken
 
-        powers = {self.RED_CELL: 0,  self.BLUE_CELL:0} # powers of red and blue
+        powers = {RED_CELL: 0,  BLUE_CELL:0} # powers of red and blue
         for cell_state in board.values():
             powers[cell_state[0]] += cell_state[1]
-        self.blue_power = powers[self.BLUE_CELL]
-        self.red_power = powers[self.RED_CELL]
+        self.blue_power = powers[BLUE_CELL]
+        self.red_power = powers[RED_CELL]
         # for debug
         # print("NEW BOARD STATE:")
         # self.render_board_state()
@@ -115,14 +115,14 @@ class board_state:
     def compute_f_value(self):
         # using the number of blue cells and the heuristic, however this might not be admissable
         counts = self.count_cells()
-        return self.g_value + counts[self.BLUE_CELL]
+        return self.g_value + counts[BLUE_CELL] 
     
     # spread in every possible directions and get the resulting board states
     def generate_children(self): 
         children = []
         for coordinates, cell in self.board.items():
-            if cell[0] == self.RED_CELL:
-                for direction in self.VALID_DIRECTIONS:
+            if cell[0] == RED_CELL:
+                for direction in VALID_DIRECTIONS:
                     board_copy = dict(self.board)
                     self.spread(board_copy, direction, coordinates)
                     children.append(board_state(self, board_copy, self.g_value+1, coordinates + direction))
@@ -167,7 +167,7 @@ class board_state:
                 current_board[target_coordinate] = ("r", curr_power + 1)
       
     def count_cells(self) -> dict[str, int]:
-        counts = {self.RED_CELL: 0, self.BLUE_CELL: 0}
+        counts = {RED_CELL: 0, BLUE_CELL: 0}
         for cell in self.board.values():
             counts[cell[0]] += 1
 
