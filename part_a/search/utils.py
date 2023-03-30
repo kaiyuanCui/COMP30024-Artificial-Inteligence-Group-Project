@@ -114,6 +114,16 @@ class board_state:
         print(render_board(self.board))
         print("================================\n")
 
+    def get_blue_cells(self):
+        blue_cells = []
+        for cell in self.board.values():
+            if cell[0] == "b":
+                blue_cells.append(self.board.get(cell))
+        return blue_cells
+
+
+
+
     def compute_f_value(self):
         # using the number of blue cells and the heuristic, however this might not be admissable
         counts = self.count_cells()
