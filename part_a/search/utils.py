@@ -122,8 +122,6 @@ class board_state:
         return blue_cells
 
 
-
-
     def compute_f_value(self):
         # using the number of blue cells and the heuristic, however this might not be admissable
         counts = self.count_cells()

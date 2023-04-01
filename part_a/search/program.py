@@ -76,4 +76,8 @@ def least_cost_from_cell(from_x: int, from_y: int, cell: tuple, power: int):
     min_distance = min(x_diff, y_diff) + abs(x_diff - y_diff)
     return max(0, min_distance - power)
 
+def least_total_cost(board: board_state):
+    for blue_cell in board.get_blue_cells():
+
+
 
