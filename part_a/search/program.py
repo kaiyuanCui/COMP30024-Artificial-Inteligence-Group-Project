@@ -65,19 +65,11 @@ def compute_distances(board: dict[tuple, tuple]) -> dict[tuple, dict[tuple, int]
         if blue_cell[0] == 'b':
             distances[blue_cell] = {}
             for red_cell in board:
-                if blue_cell[0] == 'r':
+                if red_cell[0] == 'r':
                     # manhattan distances
                     distances[blue_cell][red_cell] = abs(blue_cell[0] - red_cell[0]) + abs(blue_cell[0] - red_cell[0])
     return distances
 
-def least_cost_from_cell(from_x: int, from_y: int, cell: tuple, power: int):
-    x_diff = abs(from_x - cell[0])
-    y_diff = abs(from_y - cell[1])
-    min_distance = min(x_diff, y_diff) + abs(x_diff - y_diff)
-    return max(0, min_distance - power)
-
-def least_total_cost(board: board_state):
-    for blue_cell in board.get_blue_cells():
 
 
 
