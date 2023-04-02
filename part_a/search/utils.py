@@ -116,16 +116,16 @@ class board_state:
 
     def get_blue_cells(self):
         blue_cells = []
-        for cell in self.board.values():
+        for coords, cell in self.board.items(): 
             if cell[0] == "b":
-                blue_cells.append(self.board.get(cell))
+                blue_cells.append(coords)
         return blue_cells
 
 
     def compute_f_value(self):
         # using the number of blue cells and the heuristic, however this might not be admissable
         counts = self.count_cells()
-        return self.g_value + counts[BLUE_CELL] 
+        return self.g_value + self.least_total_cost()
     
     # spread in every possible directions and get the resulting board states
     def generate_children(self): 
@@ -179,3 +179,31 @@ class board_state:
             counts[cell[0]] += 1
 
         return counts
+    
+    def least_cost_from_cell(self, from_x: int, from_y: int, cell: tuple, power: int):
+        x_diff = abs(from_x - cell[0])
+        y_diff = abs(from_y - cell[1])
+        min_distance = min(x_diff, y_diff) + abs(x_diff - y_diff)
+        return max(0, min_distance - power) + 1
+
+    
+    def least_total_cost(self):
+        # this is slower than summing up the costs to each blue cell, but should be admissable?
+        least_costs = {} #  key: coords of the cell from which the least cost is achieved; value: cost
+        for blue_cell in self.get_blue_cells():  # we can store blue cells as an attribute to further improve time complexity
+            least_cost = float('inf') # initialise with very big number
+            from_cell = None
+            for coords, red_cell in self.board.items():
+                if red_cell[0] == 'r':
+                    cost = self.least_cost_from_cell(coords[0], coords[1], blue_cell, red_cell[1])
+                    if cost < least_cost:
+                        least_cost = cost
+                        from_cell = coords
+            # can be ignored if there is already a larger least cost from this cell          
+            if from_cell in least_costs.keys() and least_cost < least_costs[from_cell]:
+                continue
+                
+            least_costs[from_cell] = least_cost
+        
+
+        return sum(least_costs.values())
