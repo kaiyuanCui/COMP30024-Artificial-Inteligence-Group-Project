@@ -153,6 +153,8 @@ class board_state:
     # i moved the function here so that generate_children can call it - Kevin
     def spread(self, current_board: dict[tuple, tuple], direction: tuple, coordinate: tuple):
         power = current_board[coordinate][1]
+        # remove the cell to spread from
+        current_board.pop(coordinate)
         for step in range(1, power + 1):
             target_coordinate = (coordinate[0] + direction[0] * step, coordinate[1] + direction[1] * step)
             # accounting for the wrap around of the board
@@ -172,6 +174,8 @@ class board_state:
             # case where the power of the cell is in a valid range
             else:
                 current_board[target_coordinate] = ("r", curr_power + 1)
+
+        
       
     def count_cells(self) -> dict[str, int]:
         counts = {RED_CELL: 0, BLUE_CELL: 0}
