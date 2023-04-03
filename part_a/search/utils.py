@@ -115,6 +115,7 @@ class board_state:
         print("================================\n")
 
     def get_blue_cells(self):
+        # we can also just record this as an attribute and update it only when we elimate a blue cell
         blue_cells = []
         for coords, cell in self.board.items(): 
             if cell[0] == "b":
@@ -123,8 +124,6 @@ class board_state:
 
 
     def compute_f_value(self):
-        # using the number of blue cells and the heuristic, however this might not be admissable
-        counts = self.count_cells()
         return self.g_value + self.least_total_cost()
     
     # spread in every possible directions and get the resulting board states
@@ -150,7 +149,6 @@ class board_state:
         return actions
 
 
-    # i moved the function here so that generate_children can call it - Kevin
     def spread(self, current_board: dict[tuple, tuple], direction: tuple, coordinate: tuple):
         power = current_board[coordinate][1]
         # remove the cell to spread from
@@ -175,15 +173,7 @@ class board_state:
             else:
                 current_board[target_coordinate] = ("r", curr_power + 1)
 
-        
-      
-    def count_cells(self) -> dict[str, int]:
-        counts = {RED_CELL: 0, BLUE_CELL: 0}
-        for cell in self.board.values():
-            counts[cell[0]] += 1
 
-        return counts
-    
     def least_cost_from_cell(self, from_x: int, from_y: int, cell: tuple, power: int):
         x_diff = abs(from_x - cell[0])
         y_diff = abs(from_y - cell[1])
@@ -200,6 +190,7 @@ class board_state:
             for coords, red_cell in self.board.items():
                 if red_cell[0] == 'r':
                     cost = self.least_cost_from_cell(coords[0], coords[1], blue_cell, red_cell[1])
+                    # a tie breaker can also be added here to select the cell with a higher power when two cells have the same cost
                     if cost < least_cost:
                         least_cost = cost
                         from_cell = coords
