@@ -27,12 +27,13 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
         curr_state = generated.get()[-1]
 
         if curr_state.blue_power == 0:
-            return curr_state.get_all_actions() # solution found
+            # solution found
+            return curr_state.get_all_actions()
         for state in curr_state.generate_children():
             insert_order += 1
-            generated.put((state.compute_f_value(), insert_order , state))
+            generated.put((state.compute_f_value(), insert_order, state))
         
-    # no solution is found, which should not be possible if our algorithm is correct    
+    # no solution is found
     return []
 
 

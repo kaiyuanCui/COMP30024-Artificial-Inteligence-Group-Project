@@ -93,7 +93,8 @@ class board_state:
         self.g_value = g_value
         self.action_taken = action_taken
 
-        powers = {RED_CELL: 0,  BLUE_CELL:0} # powers of red and blue
+        # powers of red and blue
+        powers = {RED_CELL: 0,  BLUE_CELL:0}
         for cell_state in board.values():
             powers[cell_state[0]] += cell_state[1]
         self.blue_power = powers[BLUE_CELL]
@@ -179,10 +180,11 @@ class board_state:
 
     # the heuristic: the sum of the least costs to spread to each of the blue cells
     def least_total_cost(self):
-        # this is slower than summing up the costs to each blue cell, but should be admissable?
-        least_costs = {} #  key: coords of the cell from which the least cost is achieved; value: cost
-        for blue_cell in self.get_blue_cells():  
-            least_cost = float('inf') # initialise with very big number
+        # key: coords of the cell from which the least cost is achieved; value: cost
+        least_costs = {}
+        for blue_cell in self.get_blue_cells():
+            # initialise least_cost with a very big number
+            least_cost = float('inf')
             from_cell = None
 
             for coords, red_cell in self.board.items():
@@ -193,7 +195,7 @@ class board_state:
                         least_cost = cost
                         from_cell = coords
                         
-            # can be ignored if there is already a larger least cost from this cell          
+            # can be ignored if there is already a larger least_cost from this cell
             if from_cell in least_costs.keys() and least_cost < least_costs[from_cell]:
                 continue
                 
