@@ -87,8 +87,6 @@ def render_board(board: dict[tuple, tuple], ansi=False) -> str:
 
 class board_state:
 
-    # i am not sure if this is correct, but i attempted to start with the creation of the board_state class - Bryant
-    # i think this should work, apparently in python we can't overload the constructor, so i made a function to handle the initial state - Kevin
     def __init__(self, parent, board:dict[tuple, tuple], g_value: int, action_taken:tuple):
         self.parent = parent
         self.board = board
@@ -100,9 +98,7 @@ class board_state:
             powers[cell_state[0]] += cell_state[1]
         self.blue_power = powers[BLUE_CELL]
         self.red_power = powers[RED_CELL]
-        # for debug
-        # print("NEW BOARD STATE:")
-        # self.render_board_state()
+
 
     def render_board_state(self):
         print("================================\n")
@@ -138,9 +134,8 @@ class board_state:
         return children
 
 
-    
+    # trace back to root node and find all actions taken
     def get_all_actions(self):
-        # trace back to root node and find all actions taken
         actions = []
         curr_node = self
         while(curr_node.parent):
@@ -149,6 +144,7 @@ class board_state:
         return actions
 
 
+    # spread a cell on the board in a given direction
     def spread(self, current_board: dict[tuple, tuple], direction: tuple, coordinate: tuple):
         power = current_board[coordinate][1]
         # remove the cell to spread from
@@ -174,26 +170,29 @@ class board_state:
                 current_board[target_coordinate] = ("r", curr_power + 1)
 
 
+    # computes the minimum cost for a red cell to spread to a blue cell
     def least_cost_from_cell(self, from_x: int, from_y: int, cell: tuple, power: int):
         x_diff = abs(from_x - cell[0])
         y_diff = abs(from_y - cell[1])
         min_distance = min(x_diff, y_diff) + abs(x_diff - y_diff)
         return max(0, min_distance - power) + 1
 
-    
+    # the heuristic: the sum of the least costs to spread to each of the blue cells
     def least_total_cost(self):
         # this is slower than summing up the costs to each blue cell, but should be admissable?
         least_costs = {} #  key: coords of the cell from which the least cost is achieved; value: cost
-        for blue_cell in self.get_blue_cells():  # we can store blue cells as an attribute to further improve time complexity
+        for blue_cell in self.get_blue_cells():  
             least_cost = float('inf') # initialise with very big number
             from_cell = None
+
             for coords, red_cell in self.board.items():
                 if red_cell[0] == 'r':
                     cost = self.least_cost_from_cell(coords[0], coords[1], blue_cell, red_cell[1])
-                    # a tie breaker can also be added here to select the cell with a higher power when two cells have the same cost
+
                     if cost < least_cost:
                         least_cost = cost
                         from_cell = coords
+                        
             # can be ignored if there is already a larger least cost from this cell          
             if from_cell in least_costs.keys() and least_cost < least_costs[from_cell]:
                 continue

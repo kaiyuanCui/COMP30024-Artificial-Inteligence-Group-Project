@@ -23,16 +23,9 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
     insert_order = 0
     generated.put((initial_state.compute_f_value(), insert_order, initial_state))
     while not generated.empty():
+        # pop state with lowest f-value from queue
         curr_state = generated.get()[-1]
 
-        # for debug
-        """
-        print("EXPANDING:")
-        curr_state.render_board_state()
-        print("PARENT:")
-        if (curr_state.parent):
-            curr_state.parent.render_board_state()
-        """
         if curr_state.blue_power == 0:
             return curr_state.get_all_actions() # solution found
         for state in curr_state.generate_children():
@@ -42,20 +35,6 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
     # no solution is found, which should not be possible if our algorithm is correct    
     return []
 
-    # The render_board function is useful for debugging -- it will print out a 
-    # board state in a human-readable format. Try changing the ansi argument 
-    # to True to see a colour-coded version (if your terminal supports it).
-    print(render_board(input, ansi=False))
-
-    # Here we're returning "hardcoded" actions for the given test.csv file.
-    # Of course, you'll need to replace this with an actual solution...
-    return [
-        (5, 6, -1, 1),
-        (3, 1, 0, 1),
-        (3, 2, -1, 1),
-        (1, 4, 0, -1),
-        (1, 3, 0, -1)
-    ]
 
 def get_initial_board_state(input: dict[tuple, tuple]) -> board_state:
     return board_state(None, input, 0, None)
